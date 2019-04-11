@@ -1,1 +1,1 @@
-int test() { return 42; }
+#include "PieceChain/PieceChain.hpp"
