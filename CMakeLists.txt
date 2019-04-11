@@ -28,6 +28,10 @@ target_compile_features(PieceChain PRIVATE cxx_std_11)
 export(PACKAGE PieceChain)
 
 # Tests
-include(CTest)
-enable_testing()
-add_subdirectory(test)
+add_subdirectory(deps/Catch2)
+add_executable(PieceChainTest
+    test/main.cpp
+    test/test.cpp
+)
+target_link_libraries(PieceChainTest PRIVATE PieceChain Catch2::Catch2)
+add_custom_target(test COMMAND PieceChainTest)
