@@ -83,7 +83,7 @@
 
 
 
-namespace PieceChain {
+namespace piece_chain {
 
 
 
@@ -174,6 +174,9 @@ public:
     bool insert(size_t offset, const unsigned char* data, size_t len);
 
     /** Inserts the given data at the given offset. */
+    bool insert(size_t offset, const char* data, size_t len);
+
+    /** Inserts the given data at the given offset. */
     bool insert(size_t offset, const std::string& data);
 
     /** Deletes a range of bytes. */
@@ -181,6 +184,9 @@ public:
 
     /** Replaces a range of bytes with the given data. */
     bool replace(size_t offset, const unsigned char* data, size_t len);
+
+    /** Replaces a range of bytes with the given data. */
+    bool replace(size_t offset, const char* data, size_t len);
 
     /** Replaces a range of bytes with the given data. */
     bool replace(size_t offset, const std::string& data);
@@ -207,7 +213,7 @@ public:
      * Returns an iterator over the given section of a file.
      * Altering the contents of the file while an iterator is open will result in undefined behaviour.
      */
-    PieceChainIterator begin(size_t start, size_t end) const;
+    PieceChainIterator begin(size_t from, size_t len) const;
 
     /** Returns an iterator referring to the past-the-end element. */
     PieceChainIterator end() const;
@@ -218,6 +224,6 @@ public:
 template <typename Allocator>
 inline static std::ostream& operator<<(std::ostream& stream, const PieceChain<Allocator>& chain);
 
-} // namespace PieceChain
+} // namespace piece_chain
 
 #endif
