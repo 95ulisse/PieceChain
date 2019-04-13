@@ -5,6 +5,12 @@ project(PieceChain
     VERSION 0.1.0
 )
 
+# Compile in Release mode by default
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
+
 # Main library
 add_library(PieceChain src/test.cpp)
 
@@ -21,8 +27,14 @@ target_include_directories(PieceChain
 )
 
 # Compiler options
-target_compile_options(PieceChain PRIVATE -Wall -Wextra -pedantic -Werror)
-target_compile_features(PieceChain PRIVATE cxx_std_11)
+set(common_std cxx_std_11)
+set(common_options
+    -Wall -Wextra -pedantic -Werror
+    $<$<CONFIG:RELEASE>:-O3 -DNDEBUG>
+    $<$<CONFIG:DEBUG>:-g -fsanitize=address -DDEBUG>
+)
+target_compile_features(PieceChain PRIVATE ${common_std})
+target_compile_options(PieceChain PRIVATE ${common_options})
 
 # Export the target so that it can be referenced by our users
 export(PACKAGE PieceChain)
@@ -33,5 +45,7 @@ add_executable(PieceChainTest
     test/main.cpp
     test/test.cpp
 )
+target_compile_features(PieceChainTest PRIVATE ${common_std})
+target_compile_options(PieceChainTest PRIVATE ${common_options})
 target_link_libraries(PieceChainTest PRIVATE PieceChain Catch2::Catch2)
 add_custom_target(test COMMAND PieceChainTest)
