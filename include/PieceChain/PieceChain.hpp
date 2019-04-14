@@ -139,13 +139,10 @@ public:
  * A piece chain is a data structure that allows fast text insertion and deletion operations,
  * unlimited undo/redo and grouping of operations.
  */
-template <typename Allocator = std::allocator<unsigned char>>
-class PieceChain
-    : private Allocator // Derive from the allocator to benefit from the Empty Base Optimization in case
-{
+class PieceChain {
 public:
 
-    PieceChain(const Allocator& a = Allocator()) : Allocator(a) {}
+    PieceChain();
     explicit PieceChain(const std::string& path);
 
     PieceChain(const PieceChain&) = default;
@@ -159,13 +156,17 @@ public:
     size_t size() const;
 
     /** Returns a boolean value indicating whether or not this `PieceChain` contains any data. */
-    bool empty() const;
+    inline bool empty() const {
+        return size() == 0;
+    }
 
     /** Reads a single byte from the data. Access out of bounds is undefined behaviour. */
     unsigned char at(size_t offset) const;
 
     /** Reads a single byte from the data. Access out of bounds is undefined behaviour. */
-    unsigned char operator[](size_t offset) const;
+    inline unsigned char operator[](size_t offset) const {
+        return at(offset);
+    }
 
     /** Saves the contents of this `PieceChain` to a file. */
     bool save(const std::string& path, SaveMode mode = SaveMode::Auto);
@@ -174,10 +175,14 @@ public:
     bool insert(size_t offset, const unsigned char* data, size_t len);
 
     /** Inserts the given data at the given offset. */
-    bool insert(size_t offset, const char* data, size_t len);
+    inline bool insert(size_t offset, const char* data, size_t len) {
+        return insert(offset, (const unsigned char*) data, len);
+    }
 
     /** Inserts the given data at the given offset. */
-    bool insert(size_t offset, const std::string& data);
+    inline bool insert(size_t offset, const std::string& data) {
+        return insert(offset, (const unsigned char*) data.c_str(), data.size());
+    }
 
     /** Deletes a range of bytes. */
     bool remove(size_t offset, size_t len);
@@ -186,10 +191,14 @@ public:
     bool replace(size_t offset, const unsigned char* data, size_t len);
 
     /** Replaces a range of bytes with the given data. */
-    bool replace(size_t offset, const char* data, size_t len);
+    inline bool replace(size_t offset, const char* data, size_t len) {
+        return replace(offset, (const unsigned char*) data, len);
+    }
 
     /** Replaces a range of bytes with the given data. */
-    bool replace(size_t offset, const std::string& data);
+    inline bool replace(size_t offset, const std::string& data) {
+        return replace(offset, (const unsigned char*) data.c_str(), data.size());
+    }
 
     /** Commits any pending change in a new revision, snapshotting the current file status. */
     bool commit();
@@ -207,7 +216,9 @@ public:
      * Returns an iterator over the given section of a file.
      * Altering the contents of the file while an iterator is open will result in undefined behaviour.
      */
-    PieceChainIterator begin() const;
+    inline PieceChainIterator begin() const {
+        return begin(0, size());
+    }
 
     /**
      * Returns an iterator over the given section of a file.
@@ -221,8 +232,12 @@ public:
 };
 
 /** Writes the contents of the given `PieceChain` to the given stream. */
-template <typename Allocator>
-inline static std::ostream& operator<<(std::ostream& stream, const PieceChain<Allocator>& chain);
+inline static std::ostream& operator<<(std::ostream& stream, const PieceChain& chain) {
+    for (auto it : chain) {
+        stream.write((const char*) it.first, it.second);
+    }
+    return stream;
+}
 
 } // namespace piece_chain
 

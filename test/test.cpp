@@ -6,13 +6,13 @@
 using namespace piece_chain;
 using namespace std;
 
-static bool chain_equals(const string& str, const PieceChain<>& chain) {
+static bool chain_equals(const string& str, const PieceChain& chain) {
     ostringstream ss;
     ss << chain;
     return str == ss.str();
 }
 
-static bool chain_equals(const string& str, const PieceChain<>& chain, size_t from, size_t len) {
+static bool chain_equals(const string& str, const PieceChain& chain, size_t from, size_t len) {
     ostringstream ss;
     for (auto it = chain.begin(from, len); it != chain.end(); ++it) {
         ss.write((const char*) it->first, it->second);
@@ -21,14 +21,14 @@ static bool chain_equals(const string& str, const PieceChain<>& chain, size_t fr
 }
 
 TEST_CASE("Initial state", "[initialstate]") {
-    PieceChain<> chain;
+    PieceChain chain;
 
     REQUIRE(chain.size() == 0);
     REQUIRE_FALSE(chain.empty());
 }
 
 TEST_CASE("Insert", "[edits]") {
-    PieceChain<> chain;
+    PieceChain chain;
 
     chain.insert(0, "hello", 5);
     REQUIRE(chain_equals("hello", chain));
@@ -43,7 +43,7 @@ TEST_CASE("Insert", "[edits]") {
 }
 
 TEST_CASE("Delete", "[edits]") {
-    PieceChain<> chain;
+    PieceChain chain;
 
     chain.insert(0, "hello world", 11);
     chain.remove(0, 5);
@@ -55,7 +55,7 @@ TEST_CASE("Delete", "[edits]") {
 }
 
 TEST_CASE("Insert and delete", "[edits]") {
-    PieceChain<> chain;
+    PieceChain chain;
 
     chain.insert(0, "hello", 5);          // "hello"
     chain.remove(0, 3);                   // "lo"
@@ -68,7 +68,7 @@ TEST_CASE("Insert and delete", "[edits]") {
 }
 
 TEST_CASE("Undo", "[undo]") {
-    PieceChain<> chain;
+    PieceChain chain;
     chain.insert(0, "hello", 5);
 
     size_t pos;
@@ -94,7 +94,7 @@ TEST_CASE("Undo", "[undo]") {
 }
 
 TEST_CASE("Redo", "[undo]") {
-    PieceChain<> chain;
+    PieceChain chain;
     chain.insert(0, "hello", 5);
 
     size_t pos;
@@ -127,7 +127,7 @@ TEST_CASE("Redo", "[undo]") {
 }
 
 TEST_CASE("Undo and redo with insertions inbetween", "[undo]") {
-    PieceChain<> chain;
+    PieceChain chain;
 
     // Create a small history
     chain.insert(0, "hello", 5);  // "hello"
@@ -196,14 +196,14 @@ TEST_CASE("Undo and redo with insertions inbetween", "[undo]") {
 }
 
 TEST_CASE("Can iterate portions of text", "[iterator]") {
-    PieceChain<> chain;
+    PieceChain chain;
     chain.insert(0, "hello world", 11);
 
     REQUIRE(chain_equals("lo wor", chain, 3, 6));
 }
 
 TEST_CASE("Can iterate portions of pieces", "[iterator]") {
-    PieceChain<> chain;
+    PieceChain chain;
     chain.insert(0, " world", 6);
     chain.insert(0, "hello", 5);
 
