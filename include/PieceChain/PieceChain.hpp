@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <optional>
 
 /**
  * This is an implementation of a piece chain.
@@ -169,45 +170,45 @@ public:
     }
 
     /** Saves the contents of this `PieceChain` to a file. */
-    bool save(const std::string& path, SaveMode mode = SaveMode::Auto);
+    void save(const std::string& path, SaveMode mode = SaveMode::Auto);
 
     /** Inserts the given data at the given offset. */
-    bool insert(size_t offset, const unsigned char* data, size_t len);
+    void insert(size_t offset, const unsigned char* data, size_t len);
 
     /** Inserts the given data at the given offset. */
-    inline bool insert(size_t offset, const char* data, size_t len) {
+    inline void insert(size_t offset, const char* data, size_t len) {
         return insert(offset, (const unsigned char*) data, len);
     }
 
     /** Inserts the given data at the given offset. */
-    inline bool insert(size_t offset, const std::string& data) {
+    inline void insert(size_t offset, const std::string& data) {
         return insert(offset, (const unsigned char*) data.c_str(), data.size());
     }
 
     /** Deletes a range of bytes. */
-    bool remove(size_t offset, size_t len);
+    void remove(size_t offset, size_t len);
 
     /** Replaces a range of bytes with the given data. */
-    bool replace(size_t offset, const unsigned char* data, size_t len);
+    void replace(size_t offset, const unsigned char* data, size_t len);
 
     /** Replaces a range of bytes with the given data. */
-    inline bool replace(size_t offset, const char* data, size_t len) {
+    inline void replace(size_t offset, const char* data, size_t len) {
         return replace(offset, (const unsigned char*) data, len);
     }
 
     /** Replaces a range of bytes with the given data. */
-    inline bool replace(size_t offset, const std::string& data) {
+    inline void replace(size_t offset, const std::string& data) {
         return replace(offset, (const unsigned char*) data.c_str(), data.size());
     }
 
     /** Commits any pending change in a new revision, snapshotting the current file status. */
-    bool commit();
+    void commit();
 
-    /** Undoes a recent modification. `*pos` contains the location of the last change, if the file changed. */
-    bool undo(size_t* pos);
+    /** Undoes a recent modification. Returns the location of the last change, if the file changed. */
+    std::optional<size_t> undo();
 
-    /** Redoes an undone modification. `*pos` contains the location of the last change, if the file changed. */
-    bool redo(size_t* pos);
+    /** Redoes an undone modification. Returns the location of the last change, if the file changed. */
+    std::optional<size_t> redo();
 
     /** Discards all the data stored in this `PieceChain`. Note that this does NOT discard undo history. */
     void clear();

@@ -71,8 +71,7 @@ TEST_CASE("Undo", "[undo]") {
     PieceChain chain;
     chain.insert(0, "hello", 5);
 
-    size_t pos;
-    REQUIRE(chain.undo(&pos));
+    size_t pos = *chain.undo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("", chain));
 
@@ -80,16 +79,15 @@ TEST_CASE("Undo", "[undo]") {
     chain.commit();
     chain.insert(5, " world", 6);
 
-    REQUIRE(chain.undo(&pos));
+    pos = *chain.undo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello", chain));
 
-    REQUIRE(chain.undo(&pos));
+    pos = *chain.undo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("", chain));
 
-    REQUIRE_FALSE(chain.undo(&pos));
-    REQUIRE(pos == 0);
+    REQUIRE_FALSE(chain.undo());
     REQUIRE(chain_equals("", chain));
 }
 
@@ -97,32 +95,32 @@ TEST_CASE("Redo", "[undo]") {
     PieceChain chain;
     chain.insert(0, "hello", 5);
 
-    size_t pos;
-    REQUIRE_FALSE(chain.redo(&pos));
+    REQUIRE_FALSE(chain.redo());
     REQUIRE(chain_equals("hello", chain));
 
     chain.insert(5, " world", 6);
 
-    REQUIRE(chain.undo(&pos));
+    size_t pos;
+    pos = *chain.undo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello", chain));
 
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello world", chain));
 
-    REQUIRE(chain.undo(&pos));
-    REQUIRE(chain.undo(&pos));
+    REQUIRE(chain.undo());
+    REQUIRE(chain.undo());
     REQUIRE(chain_equals("", chain));
 
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("hello", chain));
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello world", chain));
     
-    REQUIRE_FALSE(chain.redo(&pos));
+    REQUIRE_FALSE(chain.redo());
     REQUIRE(chain_equals("hello world", chain));
 }
 
@@ -148,46 +146,46 @@ TEST_CASE("Undo and redo with insertions inbetween", "[undo]") {
 
     // Start navigating revisions to test undoing of both insertion and deletions
 
-    size_t pos;
-    REQUIRE_FALSE(chain.redo(&pos));
+    REQUIRE_FALSE(chain.redo());
 
-    REQUIRE(chain.undo(&pos));
+    size_t pos;
+    pos = *chain.undo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello_world", chain));
 
-    REQUIRE(chain.undo(&pos));
+    pos = *chain.undo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("world", chain));
 
-    REQUIRE(chain.undo(&pos));
+    pos = *chain.undo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("lworld", chain));
 
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("world", chain));
 
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 0);
     REQUIRE(chain_equals("hello_world", chain));
 
-    REQUIRE(chain.redo(&pos));
+    pos = *chain.redo();
     REQUIRE(pos == 5);
     REQUIRE(chain_equals("hello world", chain));
 
-    REQUIRE_FALSE(chain.redo(&pos));
+    REQUIRE_FALSE(chain.redo());
 
     // Unroll to the beginning and then to the end to count the number of revisions
 
     int nrevisions = 0;
-    while (chain.undo(&pos)) {
+    while (chain.undo()) {
         nrevisions++;
     }
     REQUIRE(chain_equals("", chain));
     REQUIRE(nrevisions == 7);
 
     nrevisions = 0;
-    while (chain.redo(&pos)) {
+    while (chain.redo()) {
         nrevisions++;
     }
     REQUIRE(chain_equals("hello world", chain));

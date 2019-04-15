@@ -12,7 +12,7 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 # Main library
-add_library(PieceChain src/test.cpp)
+add_library(PieceChain src/PieceChain.cpp)
 
 # Alias for testing
 add_library(PieceChain::PieceChain ALIAS PieceChain)
@@ -27,7 +27,7 @@ target_include_directories(PieceChain
 )
 
 # Compiler options
-set(common_std cxx_std_11)
+set(common_std cxx_std_17)
 set(common_options
     -Wall -Wextra -pedantic -Werror
     $<$<CONFIG:RELEASE>:-O3 -DNDEBUG>
@@ -43,7 +43,7 @@ export(PACKAGE PieceChain)
 add_subdirectory(deps/Catch2)
 add_executable(PieceChainTest
     test/main.cpp
-    test/test.cpp
+    test/PieceChain.cpp
 )
 target_compile_features(PieceChainTest PRIVATE ${common_std})
 target_compile_options(PieceChainTest PRIVATE ${common_options})
