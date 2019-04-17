@@ -1,0 +1,23 @@
+language: cpp
+os: linux
+dist: xenial
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - cmake
+
+env:
+  - BUILD_TYPE=Release
+  - BUILD_TYPE=Debug
+
+script:
+  - export CC=gcc-7
+  - export CXX=g++-7
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_RELEASE_TYPE=$BUILD_TYPE ..
+  - make test

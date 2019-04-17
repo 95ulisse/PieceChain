@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 
 project(PieceChain
     LANGUAGES C CXX
@@ -35,7 +35,7 @@ set(common_options
 )
 target_compile_features(PieceChain PRIVATE ${common_std})
 target_compile_options(PieceChain PRIVATE ${common_options})
-target_link_options(PieceChain PRIVATE ${common_options})
+target_link_libraries(PieceChain PRIVATE "${common_options}")
 
 # Export the target so that it can be referenced by our users
 export(PACKAGE PieceChain)
@@ -48,6 +48,6 @@ add_executable(PieceChainTest
 )
 target_compile_features(PieceChainTest PRIVATE ${common_std})
 target_compile_options(PieceChainTest PRIVATE ${common_options})
-target_link_options(PieceChainTest PRIVATE ${common_options})
+target_link_libraries(PieceChainTest PRIVATE "${common_options}")
 target_link_libraries(PieceChainTest PRIVATE PieceChain Catch2::Catch2)
 add_custom_target(test COMMAND PieceChainTest)
