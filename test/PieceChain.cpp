@@ -24,7 +24,7 @@ TEST_CASE("Initial state", "[initialstate]") {
     PieceChain chain;
 
     REQUIRE(chain.size() == 0);
-    REQUIRE_FALSE(chain.empty());
+    REQUIRE(chain.empty());
 }
 
 TEST_CASE("Insert", "[edits]") {

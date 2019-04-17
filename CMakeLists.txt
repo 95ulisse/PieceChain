@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13)
 
 project(PieceChain
-    LANGUAGES CXX
+    LANGUAGES C CXX
     VERSION 0.1.0
 )
 
@@ -12,7 +12,7 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 # Main library
-add_library(PieceChain src/PieceChain.cpp)
+add_library(PieceChain src/PieceChain.c)
 
 # Alias for testing
 add_library(PieceChain::PieceChain ALIAS PieceChain)
@@ -35,6 +35,7 @@ set(common_options
 )
 target_compile_features(PieceChain PRIVATE ${common_std})
 target_compile_options(PieceChain PRIVATE ${common_options})
+target_link_options(PieceChain PRIVATE ${common_options})
 
 # Export the target so that it can be referenced by our users
 export(PACKAGE PieceChain)
@@ -47,5 +48,6 @@ add_executable(PieceChainTest
 )
 target_compile_features(PieceChainTest PRIVATE ${common_std})
 target_compile_options(PieceChainTest PRIVATE ${common_options})
+target_link_options(PieceChainTest PRIVATE ${common_options})
 target_link_libraries(PieceChainTest PRIVATE PieceChain Catch2::Catch2)
 add_custom_target(test COMMAND PieceChainTest)
