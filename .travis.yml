@@ -9,15 +9,23 @@ addons:
     packages:
       - g++-7
       - cmake
-
-env:
-  - BUILD_TYPE=Release
-  - BUILD_TYPE=Debug
+      - lcov
 
 script:
   - export CC=gcc-7
   - export CXX=g++-7
   - mkdir build
   - cd build
-  - cmake -DCMAKE_RELEASE_TYPE=$BUILD_TYPE ..
+  - cmake -DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug ..
   - make test
+
+after_success:
+  # Create lcov report
+  # capture coverage info
+  - lcov --directory . --capture --output-file coverage.info
+  # filter out system and extra files
+  - lcov --remove coverage.info '/usr/*' '*/deps/*' --output-file coverage.info
+  # output coverage data for debugging
+  - lcov --list coverage.info
+  # Uploading to CodeCov
+  - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
