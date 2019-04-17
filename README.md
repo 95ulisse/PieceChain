@@ -1,4 +1,4 @@
-# PieceChain
+# PieceChain [![Build Status](https://travis-ci.org/95ulisse/PieceChain.svg?branch=master)](https://travis-ci.org/95ulisse/PieceChain)
 
 This is an implementation of a piece chain.
 A piece chain is a data structure that allows fast text insertion and deletion operations,
