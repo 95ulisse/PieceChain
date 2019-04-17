@@ -216,3 +216,45 @@ TEST_CASE("Can iterate portions of pieces", "[iterator]") {
     REQUIRE(chain_equals("or", chain, 7, 2));
     REQUIRE(chain_equals("ld", chain, 9, 2));
 }
+
+TEST_CASE("Opens file correctly", "[file]") {
+    // Create a file in the cwd and try to read back its contents
+    system("echo 'Test file contents' > test1.txt");
+    PieceChain chain("test1.txt");
+    REQUIRE(chain_equals("Test file contents\n", chain));
+}
+
+TEST_CASE("Saves file correctly", "[file]") {
+    PieceChain chain;
+    chain.insert(0, "Test file contents\n");
+
+    string path;
+    SaveMode mode;
+
+    SECTION("Auto mode") {
+        path = "test2-auto.txt";
+        mode = SaveMode::Auto;
+    }
+
+    SECTION("Atomic mode") {
+        path = "test2-atomic.txt";
+        mode = SaveMode::Atomic;
+    }
+
+    SECTION("In-place mode") {
+        path = "test2-inplace.txt";
+        mode = SaveMode::InPlace;
+    }
+
+    chain.save(path, mode);
+
+    // Check the MD5 of the saved file
+    string command =
+        "[ "
+            "\"$(md5sum " + path + " | cut -d ' ' -f 1)\""
+            " = "
+            "\"a41872ff87fe2c2757379f93842dd33e\"" // MD5 of "Test file contents\n"
+        " ]";
+    printf("=========== %s\n", command.c_str());
+    REQUIRE(system(command.c_str()) == 0);
+}
