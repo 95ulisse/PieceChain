@@ -217,6 +217,35 @@ TEST_CASE("Can iterate portions of pieces", "[iterator]") {
     REQUIRE(chain_equals("ld", chain, 9, 2));
 }
 
+TEST_CASE("Iterators are copyable", "[iterator]") {
+    PieceChain chain;
+    chain.insert(0, "hello world", 11);
+
+    auto it = chain.begin();
+    PieceChainIterator it2(it); // Copy the iterator here
+
+    ostringstream ss;
+    for (; it2 != chain.end(); it2++ /* And also here due to postfix increment */) {
+        ss.write((const char*) it2->first, it2->second);
+    }
+
+    REQUIRE(ss.str() == "hello world");
+}
+
+TEST_CASE("Single byte access", "[iterator]") {
+    PieceChain chain;
+    chain.insert(0, " world", 6);
+    chain.insert(0, "hello", 5);
+
+    const string expected = "hello world";
+    REQUIRE(chain.size() == expected.size());
+
+    for (size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(expected.at(i) == chain[i]);
+        REQUIRE(expected.at(i) == chain.at(i));
+    }
+}
+
 TEST_CASE("Opens file correctly", "[file]") {
     // Create a file in the cwd and try to read back its contents
     system("echo 'Test file contents' > test1.txt");
@@ -255,6 +284,5 @@ TEST_CASE("Saves file correctly", "[file]") {
             " = "
             "\"a41872ff87fe2c2757379f93842dd33e\"" // MD5 of "Test file contents\n"
         " ]";
-    printf("=========== %s\n", command.c_str());
     REQUIRE(system(command.c_str()) == 0);
 }

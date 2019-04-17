@@ -153,7 +153,7 @@ public:
 
     PieceChainIterator operator++(int) {
         PieceChainIterator tmp(*this);
-        (*this)++;
+        ++(*this);
         return tmp;
     }
 
